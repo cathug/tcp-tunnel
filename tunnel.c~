@@ -1,0 +1,408 @@
+/*#include <netinet/in.h>*/
+/*#include <time.h>*/
+/*#include <strings.h>*/
+/*#include <stdio.h>*/
+/*#include <stdlib.h>*/
+/*#include <string.h>*/
+/*#include <unistd.h>*/
+/*#include <arpa/inet.h>*/
+/*#include <netdb.h>*/
+
+
+
+/*#define MAXLINE         4096    /* max text line length */
+/*#define LISTENQ         1024    /* 2nd argument to listen() */
+/*#define DAYTIME_PORT    3333*/
+/*#define ADDR_LEN        256*/
+
+
+
+
+
+
+/*int main(int argc, char **argv)*/
+/*{*/
+/*    // perform argument check*/
+/*    if ( argc != 2 )*/
+/*    {*/
+/*        printf("usage: tunnel <tunnelPort>\n");*/
+/*        exit(1);*/
+/*    }*/
+/*    */
+/*    */
+/*    // if everything is ok, do the following*/
+/*    int listenfd, sockfd, connfd;*/
+/*    int n;*/
+/*    int tunnelPort, serverPort;*/
+/*    socklen_t clientlen;*/
+/*    struct sockaddr_in tunneladdr, servaddr, clientaddr;*/
+/*    char buff[MAXLINE];*/
+/*    char forward[2][MAXLINE + 1];*/
+/*    char client_ip[ADDR_LEN];   // client ip address*/
+/*    char clientname[ADDR_LEN];  // client name*/
+
+
+
+
+/*    // create TCP sockets*/
+/*    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) */
+/*    {*/
+/*        printf("sockfd socket error\n");*/
+/*        exit(1);*/
+/*    }*/
+/*    */
+/*    if ( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)*/
+/*    {*/
+/*        printf("listenfd socket error\n");*/
+/*        exit(1);*/
+/*    }*/
+
+
+
+
+/*    // specify server address and port number*/
+/*    // then bind and listen*/
+/*    tunnelPort = atoi(argv[1]);    // convert port number to integer*/
+/*    bzero(&tunneladdr, sizeof(tunneladdr));*/
+/*    tunneladdr.sin_family = AF_INET;*/
+/*    tunneladdr.sin_addr.s_addr = htonl(INADDR_ANY);   // IP address of server*/
+/*    tunneladdr.sin_port = htons(tunnelPort);             // server port number*/
+/*    */
+/*    */
+/*    if ( bind(listenfd, (struct sockaddr *) &tunneladdr, sizeof(tunneladdr)) < 0 )*/
+/*    {*/
+/*        printf("Tunnel failed to assign local protocol address to socket\n");*/
+/*	    exit(1);*/
+/*    };*/
+
+/*    */
+/*    if ( listen(listenfd, LISTENQ) < 0 )*/
+/*    {*/
+/*        printf("Tunnel failed to convert socket to passive mode.\n");*/
+/*        exit(1);*/
+/*    }*/
+
+
+/*    // accept any connection requests*/
+/*    for ( ; ; ) */
+/*    {*/
+/*        clientlen = sizeof(clientaddr);*/
+/*        connfd = accept(listenfd, (struct sockaddr *) &clientaddr, &clientlen);*/
+/*        if ( connfd < 0 )*/
+/*        {*/
+/*            printf("Failed to accept connection request from client\n");*/
+/*            exit(1);*/
+/*        }*/
+/*        */
+/*        if ( inet_ntop(AF_INET, &clientaddr.sin_addr, client_ip, ADDR_LEN) == NULL)*/
+/*        {*/
+/*            printf("Failed to translate from binary to presentation IP address \n");*/
+/*            exit(1);*/
+/*        }*/
+/*        */
+/*        if ( getnameinfo((struct sockaddr *) &clientaddr, sizeof(clientaddr),*/
+/*             clientname, sizeof(clientname), NULL, 0, 0) != 0 )*/
+/*        {*/
+/*            printf("reverse lookup failed\n");*/
+/*            exit(1);*/
+/*        }*/
+
+
+/*        */
+/*        */
+/*        // receive forwarding information from client*/
+/*        for (int i = 0; i < 2; i++)*/
+/*        {*/
+/*            while ( (n = read(sockfd, forward[i], MAXLINE)) > 0 ) */
+/*            {*/
+/*                // print name and ip address of client*/
+/*                printf("Tunnel Side\n");*/
+/*                printf("------------------------------------------------------\n");*/
+/*                printf("Requesting Client Name: %s\n", clientname);*/
+/*                printf("Requesting Client IP address: %s\n", client_ip);*/
+/*                printf("Received Client Message: %s\n",  )*/
+/*                    */
+/*                forward[i][n] = 0;        /* null terminate */
+/*                if (fputs(forward[i], stdout) == EOF) */
+/*                {*/
+/*                        printf("fputs error\n");*/
+/*                        exit(1);*/
+/*                }                      */
+/*            }         */
+/*        }*/
+
+/*        */
+/*        // forward message to server*/
+/*        //*/
+/*        //        */
+/*        // Specify server address and port number.*/
+/*        // Reverse lookup server ip address*/
+/*        // and convert IPv4 dotted decimal address to binary, then */
+/*        // store in servaddr.sin_addr pointer*/
+/*        bzero(&servaddr, sizeof(servaddr));*/
+/*        serverPort = atoi(forward[2]);*/
+/*        servaddr.sin_family = AF_INET;*/
+/*        servaddr.sin_port = htons(serverPort);  // convert port number to big endian order*/
+/*            */
+/*            */
+/*        if ( getnameinfo((struct sockaddr *) &servaddr, sizeof(servaddr),*/
+/*             serverIPAddr, sizeof(serverIPAddr), NULL, 0, 0) != 0 )*/
+/*        {*/
+/*            printf("reverse lookup failed\n");*/
+/*            exit(1);*/
+/*        }*/
+/*            */
+/*        if (inet_pton(AF_INET, serverIPAddr, &servaddr.sin_addr) <= 0)*/
+/*        {*/
+/*            printf("inet_pton error for %s\n", serverIPAddr);*/
+/*            exit(1);*/
+/*        }*/
+/*        */
+/*        */
+/*        for ( ; ; )*/
+/*        {*/
+/*        */
+/*        }*/
+/*        write(connfd, buff, strlen(buff));*/
+/*        */
+/*        */
+/*        */
+/*        printf("Sending response: %s\n", buff);*/
+
+/*        close(connfd);*/
+/*    }*/
+/*}*/
+
+
+
+#include <netinet/in.h>
+#include <time.h>
+#include <strings.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
+#define MAXLINE         4096    /* max text line length */
+#define LISTENQ         1024    /* 2nd argument to listen() */
+#define DAYTIME_PORT    3333
+#define ADDR_LEN        256
+
+int main(int argc, char **argv)
+{
+    // perform argument check
+    if ( argc != 2 )
+    {
+        printf("usage: server <portNumber>\n");
+        exit(1);
+    }
+    
+    
+    // if everything is ok, do the following
+    int listenfd, sockfd connfd, serverPort;
+    socklen_t clientlen;
+    struct sockaddr_in servaddr, clientaddr;
+    char buff[MAXLINE];
+    char client_ip[ADDR_LEN];   // client ip address
+    char clientname[ADDR_LEN];  // client name
+
+
+    // create TCP socket
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenfd < 0)
+    {
+        printf("socket error\n");
+        exit(1);
+    }
+
+
+    // specify server address and port number
+    // then bind and listen
+    serverPort = atoi(argv[1]);    // convert port number to integer
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);   // IP address of server
+    servaddr.sin_port = htons(serverPort);             // server port number
+    
+    
+    if ( bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0 )
+    {
+        printf("Server failed to assign local protocol address to socket\n");
+	    exit(1);
+    };
+
+    
+    if ( listen(listenfd, LISTENQ) < 0 )
+    {
+        printf("Server failed to convert socket to passive mode.\n");
+        exit(1);
+    }
+
+
+    // accept any connection requests
+    for ( ; ; ) 
+    {
+        clientlen = sizeof(clientaddr);
+        connfd = accept(listenfd, (struct sockaddr *) &clientaddr, &clientlen);
+        if ( connfd < 0 )
+        {
+            printf("Failed to accept connection request from client\n");
+            exit(1);
+        }
+        
+        // read and write
+        // receive stuff
+        int     sockfd;
+        int     n;
+        char    nextServer[2][MAXLINE + 1]; 
+        char    nextServerIPAddr[BUFFER_SIZE];
+        char    ipaddr[100];
+        struct sockaddr_in nextServaddr;
+        
+        // receive ip address and port from client
+        for (int i = 0; i < 2; i++)
+        {
+            read(listenfd, nextServer[i], MAXLINE)) > 0);
+        }     
+        
+        
+              
+        
+        // create TCP socket
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd < 0)
+        {
+            printf("socket error\n");
+            exit(1);
+        }
+
+
+        // Specify server address and port number.
+        // Reverse lookup server ip address
+        // and convert IPv4 dotted decimal address to binary, then 
+        // store in servaddr.sin_addr pointer
+        bzero(&nextServaddr, sizeof(nextServaddr));
+        nextServaddr.sin_family = AF_INET;
+        nextServaddr.sin_port = htons(atoi(nextServer[1]));  // convert port number to big endian order
+        
+
+        char* testval = argv[1];
+        if ( isdigit(testval[0]) )    // if first character is a number
+        {
+            // translate ip address from decimal to binary 
+            if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0)
+            {
+                printf("inet_pton error for %s\n", argv[1]);
+                exit(1);
+            }
+
+            // converts ip to machine name
+            if ( getnameinfo((struct sockaddr *) &servaddr, sizeof(servaddr),
+                serverIPAddr, sizeof(serverIPAddr), NULL, 0, 0) != 0 )
+            {
+                printf("reverse lookup failed\n");
+                exit(1);
+                
+            }
+           
+            
+            // print name and ip address of server
+            printf("Client Side\n");
+            printf("------------------------------------------------------\n");
+            printf("Server Name: %s\n", serverIPAddr);
+            printf("Server IP Address: %s\n", argv[1]); 
+        }
+
+
+
+        else if ( isalpha(testval[0]) ) // if first character is an alphabet
+        {
+            // convert machine name to ip address
+            struct addrinfo hints, *result, *node;
+            struct sockaddr_in *h;
+            
+            
+            bzero(&hints, sizeof(hints));
+            hints.ai_family = AF_INET;
+            hints.ai_socktype = SOCK_STREAM;
+            if ( getaddrinfo(argv[1], argv[2], &hints, &result) != 0 )
+            {
+                printf("reverse lookup failed\n");
+                exit(1);
+            }
+            
+            
+            for (node = result; node != NULL; node = node->ai_next)
+            {
+                h = (struct sockaddr_in *) node->ai_addr;
+                
+                // convert ip address from binary to decimal, 
+                // then copy to buffer ip
+                strcpy(ipaddr, inet_ntoa(h->sin_addr) );
+            }
+            
+            // print name and ip address of server
+            printf("Client Side\n");
+            printf("------------------------------------------------------\n");
+            printf("Server Name: %s\n", argv[1]);
+            printf("Server IP Address: %s\n", ipaddr);
+            
+            freeaddrinfo(result);
+        }
+
+    
+
+        
+        // establish TCP connection
+        if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0)
+        {
+            printf("connect error\n");
+            exit(1);
+        }
+        
+        
+        // receive stuff
+        while ( (n = read(sockfd, recvline, MAXLINE)) > 0) 
+        {
+            recvline[n] = 0;        /* null terminate */
+            if (fputs(recvline, stdout) == EOF) 
+            {
+                    printf("fputs error\n");
+                    exit(1);
+            }
+        } 
+        
+    }
+
+
+
+
+        
+        
+        write(sockfd, endhostIP, strlen(endhostIP));
+        
+        read(sockfd, recvline, MAXLINE)) 
+        
+        
+        
+        if ( inet_ntop(AF_INET, &clientaddr.sin_addr, client_ip, ADDR_LEN) == NULL)
+        {
+            printf("Failed to translate from binary to presentation IP address \n");
+            exit(1);
+        }
+        
+        if ( getnameinfo((struct sockaddr *) &clientaddr, sizeof(clientaddr),
+             clientname, sizeof(clientname), NULL, 0, 0) != 0 )
+        {
+            printf("reverse lookup failed\n");
+            exit(1);
+        }
+
+     
+
+        close(connfd);
+    }
+}
+
